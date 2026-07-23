@@ -85,21 +85,18 @@ public class AircraftObject {
     // The change logic is slowed down to once per three seconds.
     public void updateShadowBasicId() {
         switch (idToShow) {
-            case 0:
+            case 0 -> {
                 id1Shadow.setValue(identification1.getValue());
                 idToShow++;
-                break;
-            case 3:
+            }
+            case 3 -> {
                 Identification id2 = identification2.getValue();
                 if (id2 != null && id2.getIdType() != Identification.IdTypeEnum.None)
                     id2Shadow.setValue(identification2.getValue());
                 idToShow++;
-                break;
-            case 6:
-                idToShow = 0;
-                break;
-            default:
-                idToShow++;
+            }
+            case 6 -> idToShow = 0;
+            default -> idToShow++;
         }
     }
 

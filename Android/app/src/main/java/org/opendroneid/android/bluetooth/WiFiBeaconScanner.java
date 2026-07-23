@@ -66,6 +66,7 @@ public class WiFiBeaconScanner {
         this.logger = logger;
     }
 
+    @SuppressWarnings("deprecation")
     public WiFiBeaconScanner(Context context, OpenDroneIdDataManager dataManager, LogWriter logger) {
         this.dataManager = dataManager;
         this.logger = logger;
@@ -84,7 +85,6 @@ public class WiFiBeaconScanner {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             Log.d(TAG, "Turning on Wi-Fi");
-            //noinspection deprecation
             wifiManager.setWifiEnabled(true);
         }
         IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -188,11 +188,11 @@ public class WiFiBeaconScanner {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void startScan() {
         if (!wiFiScanEnabled) {
             return;
         }
-        //noinspection deprecation
         boolean ret = wifiManager.startScan();
         if (ret) {
             scanSuccess++;

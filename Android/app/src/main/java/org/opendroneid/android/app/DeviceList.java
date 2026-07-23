@@ -155,6 +155,10 @@ public class DeviceList extends Fragment {
         private final ImageView iconImageView;
         private final Drawable droneIcon;
 
+        private final Observer<Connection> connectionObserver;
+        private final Observer<LocationData> locationObserver;
+        private final Observer<Identification> observer;
+
         AircraftViewHolder(View v) {
             super(v);
             this.view = v;
@@ -168,6 +172,32 @@ public class DeviceList extends Fragment {
 
             droneIcon = ContextCompat.getDrawable(requireActivity(), R.mipmap.ic_plane_icon);
             iconImageView = v.findViewById(R.id.drone_icon);
+
+            connectionObserver = connection -> {
+                if (connection != null)
+                    rssiView.setText(String.format(Locale.US, "%s dBm", connection.rssi));
+            };
+            locationObserver = locationData -> {
+                if (locationData != null) {
+                    Resources res = getResources();
+                    textView2.setText(String.format(Locale.US, "%s over %s, %s, %s away",
+                            locationData.getHeightLessPreciseAsString(res),
+                            locationData.getHeightType().toString(),
+                            locationData.getSpeedHorizontalLessPreciseAsString(res),
+                            locationData.getDistanceAsString()));
+                }
+            };
+
+            observer = identification -> {
+                if (identification != null) {
+                    Log.w(TAG, "on changed: " + identification.getIdType() + ", " + identification.getUasIdAsString() + ", " + this);
+                    setIdText(identification);
+
+                    assert droneIcon != null;
+                    droneIcon.setColorFilter(new PorterDuffColorFilter(0xff00ff00, PorterDuff.Mode.MULTIPLY));
+                    iconImageView.setImageDrawable(droneIcon);
+                }
+            };
         }
 
         private void setIdText(Identification id) {
@@ -205,40 +235,6 @@ public class DeviceList extends Fragment {
             aircraft.connection.removeObserver(connectionObserver);
             aircraft.location.removeObserver(locationObserver);
         }
-        final Observer<Connection> connectionObserver = new Observer<Connection>() {
-            @Override
-            public void onChanged(Connection connection) {
-                if (connection != null)
-                    rssiView.setText(String.format(Locale.US, "%s dBm", connection.rssi));
-            }
-        };
-        final Observer<LocationData> locationObserver = new Observer<LocationData>() {
-            @Override
-            public void onChanged(LocationData locationData) {
-                if (locationData != null) {
-                    Resources res = getResources();
-                    textView2.setText(String.format(Locale.US, "%s over %s, %s, %s away",
-                            locationData.getHeightLessPreciseAsString(res),
-                            locationData.getHeightType().toString(),
-                            locationData.getSpeedHorizontalLessPreciseAsString(res),
-                            locationData.getDistanceAsString()));
-                }
-            }
-        };
-
-        final Observer<Identification> observer = new Observer<Identification>() {
-            @Override
-            public void onChanged(Identification identification) {
-                if (identification != null) {
-                    Log.w(TAG, "on changed: " + identification.getIdType() + ", " + identification.getUasIdAsString() + ", " + this);
-                    setIdText(identification);
-
-                    assert droneIcon != null;
-                    droneIcon.setColorFilter(new PorterDuffColorFilter(0xff00ff00, PorterDuff.Mode.MULTIPLY));
-                    iconImageView.setImageDrawable(droneIcon);
-                }
-            }
-        };
     }
 
     public class ListItem extends AbstractItem<ListItem, AircraftViewHolder> {

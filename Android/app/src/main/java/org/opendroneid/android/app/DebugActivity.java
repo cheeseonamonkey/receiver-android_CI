@@ -312,6 +312,7 @@ public class DebugActivity extends AppCompatActivity {
         finalizeOnCreate();
     }
 
+    @SuppressWarnings("deprecation")
     private void finalizeOnCreate() {
         Log.d(TAG, "finalizeOnCreate");
         btScanner = new BluetoothScanner(this, dataManager);
@@ -325,7 +326,6 @@ public class DebugActivity extends AppCompatActivity {
                     Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
                     wifiEnableLauncher.launch(panelIntent);
                 } else {
-                    //noinspection deprecation
                     wifiManager.setWifiEnabled(true);
                 }
             }

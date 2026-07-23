@@ -471,34 +471,15 @@ public class OpenDroneIdParser {
         }
         header.version = b & 0x0F;
 
-        Payload payloadObj = null;
-
-        switch (header.type) {
-            case BASIC_ID:
-                payloadObj = parseBasicId(byteBuffer);
-                break;
-            case LOCATION:
-                payloadObj = parseLocation(byteBuffer, receiverLocation);
-                break;
-            case AUTH:
-                payloadObj = parseAuthentication(byteBuffer);
-                break;
-            case SELFID:
-                payloadObj = parseSelfID(byteBuffer);
-                break;
-            case SYSTEM:
-                payloadObj = parseSystem(byteBuffer);
-                break;
-            case OPERATOR_ID:
-                payloadObj = parseOperatorID(byteBuffer);
-                break;
-            case MESSAGE_PACK:
-                payloadObj = parseMessagePack(payload, offset);
-                break;
-            default:
-                Log.w(TAG, "Received unhandled message type: id=" + type);
-
-        }
+        Payload payloadObj = switch (header.type) {
+            case BASIC_ID -> parseBasicId(byteBuffer);
+            case LOCATION -> parseLocation(byteBuffer, receiverLocation);
+            case AUTH -> parseAuthentication(byteBuffer);
+            case SELFID -> parseSelfID(byteBuffer);
+            case SYSTEM -> parseSystem(byteBuffer);
+            case OPERATOR_ID -> parseOperatorID(byteBuffer);
+            case MESSAGE_PACK -> parseMessagePack(payload, offset);
+        };
         Message<Payload> message = new Message<>(header, payloadObj, timestamp, msgCounter);
         logMessageEntry.setMsgVersion(message.header.version);
         if (header.type != Type.MESSAGE_PACK)

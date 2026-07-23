@@ -156,6 +156,13 @@ public class AircraftOsMapView extends Fragment {
         osvMap.setTileSource(TileSourceFactory.MAPNIK);
         osvMap.setMultiTouchControls(true);
 
+        setupModel();
+        setMapSettings();
+    }
+
+    public void setMapSettings() {
+        if (osvMap == null) return;
+
         MyLocationNewOverlay myLocationOverlay = new MyLocationNewOverlay(osvMap);
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.disableFollowLocation();
@@ -172,11 +179,6 @@ public class AircraftOsMapView extends Fragment {
         double pDefaultLongitude = 0;
         GeoPoint centerPoint = new GeoPoint(pDefaultLatitude, pDefaultLongitude);
         mapController.animateTo(centerPoint);
-
-        setupModel();
-    }
-
-    public void setMapSettings() {
     }
 
     class MapObserver implements Observer<LocationData> {

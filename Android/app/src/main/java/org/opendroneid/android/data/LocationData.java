@@ -63,13 +63,13 @@ public class LocationData extends MessageData {
     }
     public StatusEnum getStatus() { return status; }
     public void setStatus(int status) {
-        switch(status) {
-            case 1: this.status = StatusEnum.Ground; break;
-            case 2: this.status = StatusEnum.Airborne; break;
-            case 3: this.status = StatusEnum.Emergency; break;
-            case 4: this.status = StatusEnum.Remote_ID_System_Failure; break;
-            default: this.status = StatusEnum.Undeclared; break;
-        }
+        this.status = switch (status) {
+            case 1 -> StatusEnum.Ground;
+            case 2 -> StatusEnum.Airborne;
+            case 3 -> StatusEnum.Emergency;
+            case 4 -> StatusEnum.Remote_ID_System_Failure;
+            default -> StatusEnum.Undeclared;
+        };
     }
 
     public enum heightTypeEnum {
@@ -211,38 +211,38 @@ public class LocationData extends MessageData {
     }
     public HorizontalAccuracyEnum getHorizontalAccuracy() { return horizontalAccuracy; }
     public String getHorizontalAccuracyAsString(Resources res) {
-        switch(horizontalAccuracy) {
-            case kilometers_18_52: return "< 18.52 km";
-            case kilometers_7_408: return "< 7.408 km";
-            case kilometers_3_704: return "< 3.704 km";
-            case kilometers_1_852: return "< 1.852 km";
-            case meters_926: return "< 926 m";
-            case meters_555_6: return "< 555.6 m";
-            case meters_185_2: return "< 185.2 m";
-            case meters_92_6: return "< 92.6 m";
-            case meters_30: return "< 30 m";
-            case meters_10: return "< 10 m";
-            case meters_3: return "< 3 m";
-            case meters_1: return "< 1 m";
-            default: return res.getString(R.string.unknown);
-        }
+        return switch (horizontalAccuracy) {
+            case kilometers_18_52 -> "< 18.52 km";
+            case kilometers_7_408 -> "< 7.408 km";
+            case kilometers_3_704 -> "< 3.704 km";
+            case kilometers_1_852 -> "< 1.852 km";
+            case meters_926 -> "< 926 m";
+            case meters_555_6 -> "< 555.6 m";
+            case meters_185_2 -> "< 185.2 m";
+            case meters_92_6 -> "< 92.6 m";
+            case meters_30 -> "< 30 m";
+            case meters_10 -> "< 10 m";
+            case meters_3 -> "< 3 m";
+            case meters_1 -> "< 1 m";
+            default -> res.getString(R.string.unknown);
+        };
     }
     public void setHorizontalAccuracy(int horizontalAccuracy) {
-        switch(horizontalAccuracy) {
-            case 1: this.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_18_52; break;
-            case 2: this.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_7_408; break;
-            case 3: this.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_3_704; break;
-            case 4: this.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_1_852; break;
-            case 5: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_926; break;
-            case 6: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_555_6; break;
-            case 7: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_185_2; break;
-            case 8: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_92_6; break;
-            case 9: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_30; break;
-            case 10: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_10; break;
-            case 11: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_3; break;
-            case 12: this.horizontalAccuracy = HorizontalAccuracyEnum.meters_1; break;
-            default: this.horizontalAccuracy = HorizontalAccuracyEnum.Unknown; break;
-        }
+        this.horizontalAccuracy = switch (horizontalAccuracy) {
+            case 1 -> HorizontalAccuracyEnum.kilometers_18_52;
+            case 2 -> HorizontalAccuracyEnum.kilometers_7_408;
+            case 3 -> HorizontalAccuracyEnum.kilometers_3_704;
+            case 4 -> HorizontalAccuracyEnum.kilometers_1_852;
+            case 5 -> HorizontalAccuracyEnum.meters_926;
+            case 6 -> HorizontalAccuracyEnum.meters_555_6;
+            case 7 -> HorizontalAccuracyEnum.meters_185_2;
+            case 8 -> HorizontalAccuracyEnum.meters_92_6;
+            case 9 -> HorizontalAccuracyEnum.meters_30;
+            case 10 -> HorizontalAccuracyEnum.meters_10;
+            case 11 -> HorizontalAccuracyEnum.meters_3;
+            case 12 -> HorizontalAccuracyEnum.meters_1;
+            default -> HorizontalAccuracyEnum.Unknown;
+        };
     }
 
     public enum VerticalAccuracyEnum {
@@ -256,26 +256,26 @@ public class LocationData extends MessageData {
     }
     public VerticalAccuracyEnum getVerticalAccuracy() { return verticalAccuracy; }
     public String getVerticalAccuracyAsString(VerticalAccuracyEnum accuracy, Resources res) {
-        switch(accuracy) {
-            case meters_150: return "< 150 m";
-            case meters_45: return "< 45 m";
-            case meters_25: return "< 25 m";
-            case meters_10: return "< 10 m";
-            case meters_3: return "< 3 m";
-            case meters_1: return "< 1 m";
-            default: return res.getString(R.string.unknown);
-        }
+        return switch (accuracy) {
+            case meters_150 -> "< 150 m";
+            case meters_45 -> "< 45 m";
+            case meters_25 -> "< 25 m";
+            case meters_10 -> "< 10 m";
+            case meters_3 -> "< 3 m";
+            case meters_1 -> "< 1 m";
+            default -> res.getString(R.string.unknown);
+        };
     }
     private VerticalAccuracyEnum intToVerticalAccuracy(int verticalAccuracy) {
-        switch(verticalAccuracy) {
-            case 1: return VerticalAccuracyEnum.meters_150;
-            case 2: return VerticalAccuracyEnum.meters_45;
-            case 3: return VerticalAccuracyEnum.meters_25;
-            case 4: return VerticalAccuracyEnum.meters_10;
-            case 5: return VerticalAccuracyEnum.meters_3;
-            case 6: return VerticalAccuracyEnum.meters_1;
-            default: return VerticalAccuracyEnum.Unknown;
-        }
+        return switch (verticalAccuracy) {
+            case 1 -> VerticalAccuracyEnum.meters_150;
+            case 2 -> VerticalAccuracyEnum.meters_45;
+            case 3 -> VerticalAccuracyEnum.meters_25;
+            case 4 -> VerticalAccuracyEnum.meters_10;
+            case 5 -> VerticalAccuracyEnum.meters_3;
+            case 6 -> VerticalAccuracyEnum.meters_1;
+            default -> VerticalAccuracyEnum.Unknown;
+        };
     }
     public void setVerticalAccuracy(int verticalAccuracy) {
         this.verticalAccuracy = intToVerticalAccuracy(verticalAccuracy);
@@ -294,22 +294,22 @@ public class LocationData extends MessageData {
     }
     public SpeedAccuracyEnum getSpeedAccuracy() { return speedAccuracy; }
     public String getSpeedAccuracyAsString(Resources res) {
-        switch(speedAccuracy) {
-            case meter_per_second_10: return "< 10 m/s";
-            case meter_per_second_3: return "< 3 m/s";
-            case meter_per_second_1: return "< 1 m/s";
-            case meter_per_second_0_3: return "< 0.3 m/s";
-            default: return res.getString(R.string.unknown);
-        }
+        return switch (speedAccuracy) {
+            case meter_per_second_10 -> "< 10 m/s";
+            case meter_per_second_3 -> "< 3 m/s";
+            case meter_per_second_1 -> "< 1 m/s";
+            case meter_per_second_0_3 -> "< 0.3 m/s";
+            default -> res.getString(R.string.unknown);
+        };
     }
     public void setSpeedAccuracy(int speedAccuracy) {
-        switch(speedAccuracy) {
-            case 1: this.speedAccuracy = SpeedAccuracyEnum.meter_per_second_10; break;
-            case 2: this.speedAccuracy = SpeedAccuracyEnum.meter_per_second_3; break;
-            case 3: this.speedAccuracy = SpeedAccuracyEnum.meter_per_second_1; break;
-            case 4: this.speedAccuracy = SpeedAccuracyEnum.meter_per_second_0_3; break;
-            default: this.speedAccuracy = SpeedAccuracyEnum.Unknown; break;
-        }
+        this.speedAccuracy = switch (speedAccuracy) {
+            case 1 -> SpeedAccuracyEnum.meter_per_second_10;
+            case 2 -> SpeedAccuracyEnum.meter_per_second_3;
+            case 3 -> SpeedAccuracyEnum.meter_per_second_1;
+            case 4 -> SpeedAccuracyEnum.meter_per_second_0_3;
+            default -> SpeedAccuracyEnum.Unknown;
+        };
     }
 
     public double getLocationTimestamp() { return locationTimestamp; }

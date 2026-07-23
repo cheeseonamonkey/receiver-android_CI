@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LogWriter {
     private static final String TAG = "LogWriter";
     private final BufferedWriter writer;
+    private final ExecutorService exec;
     private static int session = 0;
     public static void bumpSession() { session++; }
     private final BlockingQueue<String> logQueue = new LinkedBlockingQueue<>();
@@ -35,13 +36,13 @@ public class LogWriter {
     public LogWriter(File file) throws IOException {
         writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-        ExecutorService exec = Executors.newSingleThreadExecutor();
+        exec = Executors.newSingleThreadExecutor();
 
         Log.i(TAG, "starting logging to " + file);
         exec.submit(() -> {
             try {
                 loggingActive = true;
-                long last = System.currentTimeMillis();
+                long lastTime = System.currentTimeMillis();
 
                 // write header
                 writer.write(TextUtils.join(",", LogEntry.HEADER));
@@ -64,9 +65,9 @@ public class LogWriter {
                     writer.write(log);
                     writer.newLine();
                     long time = System.currentTimeMillis();
-                    if (time - last > 1000) {
+                    if (time - lastTime > 1000) {
                         writer.flush();
-                        last = time;
+                        lastTime = time;
                     }
                 }
             } catch (IOException e) {
@@ -129,6 +130,7 @@ public class LogWriter {
 
     public void close() {
         loggingActive = false;
+        exec.shutdownNow();
         try {
             writer.flush();
             writer.close();

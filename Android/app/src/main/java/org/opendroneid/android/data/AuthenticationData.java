@@ -54,20 +54,20 @@ public class AuthenticationData extends MessageData {
     public AuthTypeEnum getAuthType() { return authType; }
     void setAuthType(AuthTypeEnum authType) { this.authType = authType; }
     public void setAuthType(int authType) {
-        switch(authType) {
-            case 1: this.authType = AuthTypeEnum.UAS_ID_Signature; break;
-            case 2: this.authType = AuthTypeEnum.Operator_ID_Signature; break;
-            case 3: this.authType = AuthTypeEnum.Message_Set_Signature; break;
-            case 4: this.authType = AuthTypeEnum.Network_Remote_ID; break;
-            case 5: this.authType = AuthTypeEnum.Specific_Authentication; break;
-            case 0xA: this.authType = AuthTypeEnum.Private_Use_0xA; break;
-            case 0xB: this.authType = AuthTypeEnum.Private_Use_0xB; break;
-            case 0xC: this.authType = AuthTypeEnum.Private_Use_0xC; break;
-            case 0xD: this.authType = AuthTypeEnum.Private_Use_0xD; break;
-            case 0xE: this.authType = AuthTypeEnum.Private_Use_0xE; break;
-            case 0xF: this.authType = AuthTypeEnum.Private_Use_0xF; break;
-            default: this.authType = AuthTypeEnum.None; break;
-        }
+        this.authType = switch (authType) {
+            case 1 -> AuthTypeEnum.UAS_ID_Signature;
+            case 2 -> AuthTypeEnum.Operator_ID_Signature;
+            case 3 -> AuthTypeEnum.Message_Set_Signature;
+            case 4 -> AuthTypeEnum.Network_Remote_ID;
+            case 5 -> AuthTypeEnum.Specific_Authentication;
+            case 0xA -> AuthTypeEnum.Private_Use_0xA;
+            case 0xB -> AuthTypeEnum.Private_Use_0xB;
+            case 0xC -> AuthTypeEnum.Private_Use_0xC;
+            case 0xD -> AuthTypeEnum.Private_Use_0xD;
+            case 0xE -> AuthTypeEnum.Private_Use_0xE;
+            case 0xF -> AuthTypeEnum.Private_Use_0xF;
+            default -> AuthTypeEnum.None;
+        };
     }
 
     int getAuthDataPage() { return authDataPage; }

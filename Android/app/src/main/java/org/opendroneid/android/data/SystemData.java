@@ -54,12 +54,12 @@ public class SystemData extends MessageData {
 
     public operatorLocationTypeEnum getOperatorLocationType() { return operatorLocationType; }
     public void setOperatorLocationType(int operatorLocationType) {
-        switch(operatorLocationType) {
-            case 0: this.operatorLocationType = operatorLocationTypeEnum.TakeOff; break;
-            case 1: this.operatorLocationType = operatorLocationTypeEnum.Dynamic; break;
-            case 2: this.operatorLocationType = operatorLocationTypeEnum.Fixed; break;
-            default: this.operatorLocationType = operatorLocationTypeEnum.Invalid; break;
-        }
+        this.operatorLocationType = switch (operatorLocationType) {
+            case 0 -> operatorLocationTypeEnum.TakeOff;
+            case 1 -> operatorLocationTypeEnum.Dynamic;
+            case 2 -> operatorLocationTypeEnum.Fixed;
+            default -> operatorLocationTypeEnum.Invalid;
+        };
     }
 
     public enum classificationTypeEnum {
@@ -139,12 +139,12 @@ public class SystemData extends MessageData {
     public categoryEnum getCategory() { return category; }
     public void setCategory(int category) {
         if (classificationType == classificationTypeEnum.EU) {
-            switch(category) {
-                case 1: this.category = categoryEnum.EU_Open; break;
-                case 2: this.category = categoryEnum.EU_Specific; break;
-                case 3: this.category = categoryEnum.EU_Certified; break;
-                default: this.category = categoryEnum.Undeclared; break;
-            }
+            this.category = switch (category) {
+                case 1 -> categoryEnum.EU_Open;
+                case 2 -> categoryEnum.EU_Specific;
+                case 3 -> categoryEnum.EU_Certified;
+                default -> categoryEnum.Undeclared;
+            };
         } else {
             this.category = categoryEnum.Undeclared;
         }
@@ -164,16 +164,16 @@ public class SystemData extends MessageData {
     public classValueEnum getClassValue() { return classValue; }
     public void setClassValue(int classValue) {
         if (classificationType == classificationTypeEnum.EU) {
-            switch(classValue) {
-                case 1: this.classValue = classValueEnum.EU_Class_0; break;
-                case 2: this.classValue = classValueEnum.EU_Class_1; break;
-                case 3: this.classValue = classValueEnum.EU_Class_2; break;
-                case 4: this.classValue = classValueEnum.EU_Class_3; break;
-                case 5: this.classValue = classValueEnum.EU_Class_4; break;
-                case 6: this.classValue = classValueEnum.EU_Class_5; break;
-                case 7: this.classValue = classValueEnum.EU_Class_6; break;
-                default: this.classValue = classValueEnum.Undeclared; break;
-            }
+            this.classValue = switch (classValue) {
+                case 1 -> classValueEnum.EU_Class_0;
+                case 2 -> classValueEnum.EU_Class_1;
+                case 3 -> classValueEnum.EU_Class_2;
+                case 4 -> classValueEnum.EU_Class_3;
+                case 5 -> classValueEnum.EU_Class_4;
+                case 6 -> classValueEnum.EU_Class_5;
+                case 7 -> classValueEnum.EU_Class_6;
+                default -> classValueEnum.Undeclared;
+            };
         } else {
             this.classValue = classValueEnum.Undeclared;
         }

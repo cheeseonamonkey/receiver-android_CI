@@ -111,24 +111,13 @@ public class OpenDroneIdDataManager {
     @SuppressWarnings("unchecked")
     private void handleMessages(AircraftObject ac, OpenDroneIdParser.Message<?> message) {
         switch (message.header.type) {
-            case BASIC_ID:
-                handleBasicId(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.BasicId>) message);
-                break;
-            case LOCATION:
-                handleLocation(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.Location>) message);
-                break;
-            case AUTH:
-                handleAuthentication(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.Authentication>) message);
-                break;
-            case SELFID:
-                handleSelfID(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.SelfID>) message);
-                break;
-            case SYSTEM:
-                handleSystem(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.SystemMsg>) message);
-                break;
-            case OPERATOR_ID:
-                handleOperatorID(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.OperatorID>) message);
-                break;
+            case BASIC_ID -> handleBasicId(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.BasicId>) message);
+            case LOCATION -> handleLocation(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.Location>) message);
+            case AUTH -> handleAuthentication(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.Authentication>) message);
+            case SELFID -> handleSelfID(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.SelfID>) message);
+            case SYSTEM -> handleSystem(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.SystemMsg>) message);
+            case OPERATOR_ID -> handleOperatorID(ac, (OpenDroneIdParser.Message<OpenDroneIdParser.OperatorID>) message);
+            default -> {}
         }
     }
 
