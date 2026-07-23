@@ -72,8 +72,7 @@ public class WiFiBeaconScanner {
 
         this.startTime = getCurrTimeStr();
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                !context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI)) {
             Toast.makeText(context, "WiFi Scanning is not supported", Toast.LENGTH_LONG).show();
             wiFiScanEnabled = false;
             return;

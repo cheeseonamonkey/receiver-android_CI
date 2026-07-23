@@ -117,9 +117,7 @@ public class DebugActivity extends AppCompatActivity {
             checkBluetoothSupport(menu);
             checkNaNSupport(menu);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkWiFiSupport(menu);
-        }
+        checkWiFiSupport(menu);
         return true;
     }
 
@@ -389,8 +387,7 @@ public class DebugActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             wiFiNaNScanner = new WiFiNaNScanner(this, dataManager, logger);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            wiFiBeaconScanner = new WiFiBeaconScanner(this, dataManager, logger);
+        wiFiBeaconScanner = new WiFiBeaconScanner(this, dataManager, logger);
 
         addDeviceList();
 
@@ -445,7 +442,7 @@ public class DebugActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && wiFiNaNScanner != null)
             wiFiNaNScanner.startScan();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && wiFiBeaconScanner != null)
+        if (wiFiBeaconScanner != null)
             wiFiBeaconScanner.startCountDownTimer();
 
         super.onResume();
@@ -459,7 +456,7 @@ public class DebugActivity extends AppCompatActivity {
             btScanner.stopScan();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && wiFiNaNScanner != null)
             wiFiNaNScanner.stopScan();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && wiFiBeaconScanner != null)
+        if (wiFiBeaconScanner != null)
             wiFiBeaconScanner.stopScan();
 
         handler.removeCallbacks(runnableCode);
