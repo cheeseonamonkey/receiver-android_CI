@@ -68,8 +68,8 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
 
     // FastAdapter
-    implementation 'com.mikepenz:fastadapter:3.3.1'
-    implementation 'com.mikepenz:fastadapter-commons:3.3.1'
+    implementation 'com.mikepenz:fastadapter:5.7.0'
+    implementation 'com.mikepenz:fastadapter-extensions-utils:5.7.0'
 
     // Lifecycle
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'

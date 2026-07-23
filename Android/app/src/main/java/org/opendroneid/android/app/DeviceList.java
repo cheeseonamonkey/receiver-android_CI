@@ -11,11 +11,9 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,10 +35,10 @@ import org.opendroneid.android.data.Connection;
 import org.opendroneid.android.data.Identification;
 import org.opendroneid.android.data.LocationData;
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.adapters.ModelAdapter;
-import com.mikepenz.fastadapter.commons.utils.FastAdapterUIUtils;
+import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.mikepenz.fastadapter.select.SelectExtension;
+import com.mikepenz.fastadapter.select.SelectExtensionKt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +50,8 @@ public class DeviceList extends Fragment {
     private static final String TAG = "CustomAdapter";
 
     private AircraftViewModel mModel;
-    private ModelAdapter<AircraftObject, ListItem> mItemAdapter;
+    private ItemAdapter<ListItem> mItemAdapter;
     private FastAdapter<ListItem> mAdapter;
-
-    public static DeviceList newInstance() {
-        return new DeviceList();
-    }
 
     private void subscribeToModel(AircraftViewModel model) {
         mModel = model;
@@ -65,13 +59,15 @@ public class DeviceList extends Fragment {
             if (aircraftList == null)
                 return;
             Log.d(TAG, "DeviceList onChanged: " + aircraftList);
-            mItemAdapter.setNewList(new ArrayList<>(aircraftList));
+            List<ListItem> items = new ArrayList<>();
+            for (AircraftObject aircraft : aircraftList) {
+                items.add(new ListItem(aircraft));
+            }
+            mItemAdapter.set(items);
         };
 
         model.getActiveAircraft().observe(getViewLifecycleOwner(), object -> {
-            SelectExtension<ListItem> selectExtension = mAdapter.getExtension(SelectExtension.class);
-            if (selectExtension == null)
-                return;
+            SelectExtension<ListItem> selectExtension = SelectExtensionKt.getSelectExtension(mAdapter);
             if (object == null) {
                 selectExtension.deselect();
             } else {
@@ -101,22 +97,24 @@ public class DeviceList extends Fragment {
         // Set CustomAdapter as the adapter for RecyclerView.
         // Create the ItemAdapter holding your Items
 
-        mItemAdapter = new ModelAdapter<>(ListItem::new);
+        mItemAdapter = new ItemAdapter<>();
 
         // Create the managing FastAdapter, by passing in the itemAdapter
         mAdapter = FastAdapter.with(mItemAdapter);
         mAdapter.setHasStableIds(true);
-        mAdapter.withSelectable(true);
 
-        mAdapter.withSelectionListener((item, selected) -> {
-            Log.d(TAG, "onSelectionChanged: "+item + " selected="+selected);
-            if (selected && item != null) {
+        SelectExtension<ListItem> selectExtension = SelectExtensionKt.getSelectExtension(mAdapter);
+        selectExtension.setSelectable(true);
+        selectExtension.setSelectionListener((item, selected) -> {
+            Log.d(TAG, "onSelectionChanged: " + item + " selected=" + selected);
+            if (selected) {
                 if (mModel.getActiveAircraft().getValue() != item.object) {
                     // only set if different
                     mModel.setActiveAircraft(item.object);
                 }
             }
         });
+
         RecyclerView mRecyclerView = viewGroup.findViewById(R.id.device_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
@@ -209,15 +207,13 @@ public class DeviceList extends Fragment {
         }
 
         @Override
-        public void bindView(@NonNull ListItem aircraftItem, @NonNull List<Object> payloads) {
+        public void bindView(@NonNull ListItem aircraftItem, @NonNull List<? extends Object> payloads) {
             if (getContext() == null)
                 return;
 
             this.aircraft = aircraftItem.object;
 
-            StateListDrawable selectableBackground =
-                    FastAdapterUIUtils.getSelectableBackground(getContext(), Color.LTGRAY, true);
-            view.setBackground(selectableBackground);
+            view.setBackground(ContextCompat.getDrawable(getContext(), android.R.drawable.list_selector_background));
             Identification id = aircraft.getIdentification1();
             if (id != null)
                 setIdText(id);
@@ -237,9 +233,9 @@ public class DeviceList extends Fragment {
         }
     }
 
-    public class ListItem extends AbstractItem<ListItem, AircraftViewHolder> {
+    public class ListItem extends AbstractItem<AircraftViewHolder> {
 
-        private final AircraftObject object;
+        final AircraftObject object;
 
         ListItem(AircraftObject object) {
             this.object = object;
@@ -258,7 +254,7 @@ public class DeviceList extends Fragment {
 
         @Override
         public int getType() {
-            return 0;
+            return R.id.device_list; // Just a unique ID
         }
 
         @Override
