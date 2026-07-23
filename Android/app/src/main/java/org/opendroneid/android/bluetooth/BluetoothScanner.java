@@ -7,7 +7,6 @@
 package org.opendroneid.android.bluetooth;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -79,10 +78,12 @@ public class BluetoothScanner {
             String string = String.format(Locale.US, "scan: addr=%s flags=0x%02X rssi=% d, len=%d",
                     addr, advertiseFlags, rssi, bytes != null ? bytes.length : -1);
 
-            String transportType = "BT4";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bluetoothAdapter.isLeCodedPhySupported()) {
-                if (result.getPrimaryPhy() == BluetoothDevice.PHY_LE_CODED)
-                    transportType = "BT5";
+            String transportType;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bluetoothAdapter.isLeCodedPhySupported() &&
+                    result.getPrimaryPhy() == BluetoothDevice.PHY_LE_CODED) {
+                transportType = "BT5";
+            } else {
+                transportType = "BT4";
             }
 
             LogMessageEntry logMessageEntry = new LogMessageEntry();
@@ -120,7 +121,6 @@ public class BluetoothScanner {
     private static final ParcelUuid SERVICE_pUUID = new ParcelUuid(SERVICE_UUID);
     private static final byte[] OPEN_DRONE_ID_AD_CODE = new byte[]{(byte) 0x0D};
 
-    @TargetApi(Build.VERSION_CODES.O)
     public void startScan() {
         if (bluetoothAdapter == null)
             return;
@@ -133,9 +133,7 @@ public class BluetoothScanner {
         List<ScanFilter> scanFilters = new ArrayList<>();
         scanFilters.add(builder.build());
 
-        ScanSettings scanSettings = new ScanSettings.Builder()
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .build();
+        ScanSettings scanSettings;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                 bluetoothAdapter.isLeCodedPhySupported() &&
                 bluetoothAdapter.isLeExtendedAdvertisingSupported()) {
@@ -144,6 +142,10 @@ public class BluetoothScanner {
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .setLegacy(false)
                     .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
+                    .build();
+        } else {
+            scanSettings = new ScanSettings.Builder()
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .build();
         }
 

@@ -20,11 +20,7 @@ public class OperatorIdData extends MessageData {
     }
 
     public void setOperatorIdType(int operatorIdType) {
-        if (operatorIdType < 0)
-            operatorIdType = 0;
-        if (operatorIdType > 255)
-            operatorIdType = 255;
-        this.operatorIdType = operatorIdType;
+        this.operatorIdType = Math.max(0, Math.min(255, operatorIdType));
     }
     public int getOperatorIdType() { return operatorIdType; }
 

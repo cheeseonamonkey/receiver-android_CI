@@ -180,15 +180,15 @@ public class AircraftMapView extends SupportMapFragment implements OnMapReadyCal
 
                 LatLng latLng = new LatLng(sys.getOperatorLatitude(), sys.getOperatorLongitude());
                 if (markerPilot == null) {
-                    String id = "ID missing";
+                    String pId = "ID missing";
                     if (aircraft.getIdentification1() != null)
-                        id = aircraft.getIdentification1().getUasIdAsString();
+                        pId = aircraft.getIdentification1().getUasIdAsString();
                     markerPilot = googleMap.addMarker(
                             new MarkerOptions()
                                     .alpha(0.5f)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                     .position(latLng)
-                                    .title(sys.getOperatorLocationType().toString() + ": " + id));
+                                    .title(sys.getOperatorLocationType().toString() + ": " + pId));
                     if (markerPilot != null)
                         markerPilot.setTag(new Pair<>(aircraft, this));
                 }
@@ -210,14 +210,14 @@ public class AircraftMapView extends SupportMapFragment implements OnMapReadyCal
 
             LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
             if (marker == null) {
-                String id = "ID missing";
+                String aircraftId = "ID missing";
                 if (aircraft.getIdentification1() != null)
-                    id = aircraft.getIdentification1().getUasIdAsString();
+                    aircraftId = aircraft.getIdentification1().getUasIdAsString();
                 marker = googleMap.addMarker(
                         new MarkerOptions()
                                 .alpha(0.5f)
                                 .position(latLng)
-                                .title("aircraft " + id));
+                                .title("aircraft " + aircraftId));
                 if (marker != null)
                     marker.setTag(aircraft);
                 zoom = true;

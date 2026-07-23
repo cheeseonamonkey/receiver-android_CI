@@ -6,6 +6,8 @@
  */
 package org.opendroneid.android.log;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 public class LogEntry {
@@ -43,7 +45,7 @@ public class LogEntry {
     }
 
     static LogEntry fromString(String line) {
-        String[] fields = line.split("\\s*[,]\\s*");
+        String[] fields = line.split("\\s*,\\s*");
         if (fields.length < 6) {
             return null;
         }
@@ -59,20 +61,15 @@ public class LogEntry {
             entry.data = parseHexString(fields[6]);
             return entry;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("LogEntry", "fromString failed", e);
         }
         return null;
     }
 
     public static String toHexString(byte[] bytes, int len) {
-        StringBuilder sb = new StringBuilder((len) * 3);
-        int i = 0;
-        for (byte b : bytes) {
-            i++;
-            if (i > len)
-                break;
-            int val = b & 0xFF;
-            sb.append(String.format("%02X ", val));
+        StringBuilder sb = new StringBuilder(len * 3);
+        for (int i = 0; i < len && i < bytes.length; i++) {
+            sb.append(String.format("%02X ", bytes[i] & 0xFF));
         }
         return sb.toString();
     }

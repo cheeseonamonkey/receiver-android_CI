@@ -40,68 +40,73 @@ public class LogMessageEntry {
 
     @SuppressWarnings("unchecked")
     public StringBuilder getMessageLogEntry() {
-        if (messages.size() == 0)
+        if (messages.isEmpty())
             return null;
 
         Collections.sort(messages);
 
         StringBuilder entry = new StringBuilder();
-        int i = 0;
+        int msgIndex = 0;
 
         for (int j = 0; j < 2; j++) {
-            if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.BASIC_ID) {
+            if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.BASIC_ID) {
+                @SuppressWarnings("unchecked")
                 OpenDroneIdParser.Message<OpenDroneIdParser.BasicId> message =
-                        (OpenDroneIdParser.Message<OpenDroneIdParser.BasicId>) messages.get(i);
+                        (OpenDroneIdParser.Message<OpenDroneIdParser.BasicId>) messages.get(msgIndex);
                 entry.append(message.payload.toCsvString());
-                i++;
+                msgIndex++;
             } else {
                 entry.append(DELIM_BASIC_ID);
             }
         }
         // Only two Basic ID messages are logged from message packs. Skip additional messages
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.BASIC_ID)
-            i++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.BASIC_ID)
+            msgIndex++;
 
-        if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.LOCATION) {
+        if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.LOCATION) {
+            @SuppressWarnings("unchecked")
             OpenDroneIdParser.Message<OpenDroneIdParser.Location> message =
-                    (OpenDroneIdParser.Message<OpenDroneIdParser.Location>) messages.get(i);
+                    (OpenDroneIdParser.Message<OpenDroneIdParser.Location>) messages.get(msgIndex);
             entry.append(message.payload.toCsvString());
-            i++;
+            msgIndex++;
         } else {
             entry.append(DELIM_LOCATION);
         }
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.LOCATION)
-            i++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.LOCATION)
+            msgIndex++;
 
         // Skip all authentication messages. They are added at the end
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.AUTH)
-            i++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.AUTH)
+            msgIndex++;
 
-        if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.SELFID) {
+        if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.SELFID) {
+            @SuppressWarnings("unchecked")
             OpenDroneIdParser.Message<OpenDroneIdParser.SelfID> message =
-                    (OpenDroneIdParser.Message<OpenDroneIdParser.SelfID>) messages.get(i);
+                    (OpenDroneIdParser.Message<OpenDroneIdParser.SelfID>) messages.get(msgIndex);
             entry.append(message.payload.toCsvString());
-            i++;
+            msgIndex++;
         } else {
             entry.append(DELIM_SELF_ID);
         }
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.SELFID)
-            i++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.SELFID)
+            msgIndex++;
 
-        if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.SYSTEM) {
+        if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.SYSTEM) {
+            @SuppressWarnings("unchecked")
             OpenDroneIdParser.Message<OpenDroneIdParser.SystemMsg> message =
-                    (OpenDroneIdParser.Message<OpenDroneIdParser.SystemMsg>) messages.get(i);
+                    (OpenDroneIdParser.Message<OpenDroneIdParser.SystemMsg>) messages.get(msgIndex);
             entry.append(message.payload.toCsvString());
-            i++;
+            msgIndex++;
         } else {
             entry.append(DELIM_SYSTEM);
         }
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.SYSTEM)
-            i++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.SYSTEM)
+            msgIndex++;
 
-        if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.OPERATOR_ID) {
+        if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.OPERATOR_ID) {
+            @SuppressWarnings("unchecked")
             OpenDroneIdParser.Message<OpenDroneIdParser.OperatorID> message =
-                    (OpenDroneIdParser.Message<OpenDroneIdParser.OperatorID>) messages.get(i);
+                    (OpenDroneIdParser.Message<OpenDroneIdParser.OperatorID>) messages.get(msgIndex);
             entry.append(message.payload.toCsvString());
         } else {
             entry.append(DELIM_OPERATOR);
@@ -109,18 +114,19 @@ public class LogMessageEntry {
 
         // Add the authentication data at the end. It is often not present but adds a lot of columns
         // in the log file, which can make it hard to find the self ID, System and Operator ID data
-        i = 0;
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.BASIC_ID)
-            i++;
-        while (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.LOCATION)
-            i++;
+        msgIndex = 0;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.BASIC_ID)
+            msgIndex++;
+        while (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.LOCATION)
+            msgIndex++;
         for (int j = 0; j < Constants.MAX_AUTH_DATA_PAGES; j++) {
-            if (i < messages.size() && messages.get(i).header.type == OpenDroneIdParser.Type.AUTH) {
+            if (msgIndex < messages.size() && messages.get(msgIndex).header.type == OpenDroneIdParser.Type.AUTH) {
+                @SuppressWarnings("unchecked")
                 OpenDroneIdParser.Message<OpenDroneIdParser.Authentication> message =
-                        (OpenDroneIdParser.Message<OpenDroneIdParser.Authentication>) messages.get(i);
+                        (OpenDroneIdParser.Message<OpenDroneIdParser.Authentication>) messages.get(msgIndex);
                 if (message.payload.getAuthDataPage() == j) {
                     entry.append(message.payload.toCsvString());
-                    i++;
+                    msgIndex++;
                 } else {
                     entry.append(DELIM_AUTHENTICATION);
                 }

@@ -1,7 +1,6 @@
 package org.opendroneid.android.app;
 
 import android.os.Bundle;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.DialogFragment;
 
 import org.opendroneid.android.R;
@@ -22,20 +22,20 @@ public class HelpMenu extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.help_text, container, true);
+        View view = inflater.inflate(R.layout.help_text, container, false);
 
-        TextView helpView = view.findViewById(R.id.bluetoothHelpText);
-        String linkText = getString(R.string.bluetoothHelp);
-        helpView.setText(Html.fromHtml(linkText));
+        TextView bluetoothHelpView = view.findViewById(R.id.bluetoothHelpText);
+        String bluetoothLinkText = getString(R.string.bluetoothHelp);
+        bluetoothHelpView.setText(HtmlCompat.fromHtml(bluetoothLinkText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        helpView = view.findViewById(R.id.beaconHelpText);
-        linkText = getString(R.string.beaconHelp);
-        helpView.setText(Html.fromHtml(linkText));
-        helpView.setMovementMethod(LinkMovementMethod.getInstance());
+        TextView beaconHelpView = view.findViewById(R.id.beaconHelpText);
+        String beaconLinkText = getString(R.string.beaconHelp);
+        beaconHelpView.setText(HtmlCompat.fromHtml(beaconLinkText, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        beaconHelpView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        helpView = view.findViewById(R.id.nanHelpText);
-        linkText = getString(R.string.nanHelp);
-        helpView.setText(Html.fromHtml(linkText));
+        TextView nanHelpView = view.findViewById(R.id.nanHelpText);
+        String nanLinkText = getString(R.string.nanHelp);
+        nanHelpView.setText(HtmlCompat.fromHtml(nanLinkText, HtmlCompat.FROM_HTML_MODE_LEGACY));
         return view;
     }
 }

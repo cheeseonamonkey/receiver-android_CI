@@ -7,7 +7,6 @@
 package org.opendroneid.android.bluetooth;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -55,8 +54,7 @@ public class WiFiNaNScanner {
         this.dataManager = dataManager;
         this.logger = logger;
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
-                !context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)) {
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)) {
             Log.i(TAG, "WiFi Aware is not supported.");
             return;
         }
@@ -80,10 +78,14 @@ public class WiFiNaNScanner {
                 }
             }
         };
-        context.registerReceiver(myReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(myReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            context.registerReceiver(myReceiver, filter);
+        }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private final AttachCallback attachCallback = new AttachCallback() {
         @Override
         public void onAttached(WifiAwareSession session) {
@@ -134,7 +136,7 @@ public class WiFiNaNScanner {
         }
     };
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private final IdentityChangedListener identityChangedListener = new IdentityChangedListener() {
         @Override
         public void onIdentityChanged(byte[] mac) {
@@ -146,7 +148,7 @@ public class WiFiNaNScanner {
         }
     };
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     public void startScan() {
         if (!wifiAwareSupported)
             return;
@@ -155,12 +157,12 @@ public class WiFiNaNScanner {
             try {
                 wifiAwareManager.attach(attachCallback, identityChangedListener, null);
             } catch (SecurityException e) {
-                e.printStackTrace();
+                Log.e(TAG, "startScan: SecurityException", e);
             }
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     public void stopScan() {
         if (!wifiAwareSupported)
             return;

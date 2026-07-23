@@ -92,9 +92,7 @@ public class LocationData extends MessageData {
             return res.getString(R.string.unknown);
     }
     public void setDirection(double direction) {
-        if (direction < 0 || direction > 360)
-            direction = 361; // 361 is defined in the specification as the Invalid value
-        this.direction = direction;
+        this.direction = (direction < 0 || direction > 360) ? 361 : direction;
     }
 
     public double getSpeedHorizontal() { return speedHorizontal; }
@@ -111,9 +109,10 @@ public class LocationData extends MessageData {
             return res.getString(R.string.unknown);
     }
     public void setSpeedHorizontal(double speedHorizontal) {
-        if (speedHorizontal < 0 || speedHorizontal > 254.25)
-            speedHorizontal = 255; // 255 is defined in the specification as the Invalid value
-        this.speedHorizontal = speedHorizontal;
+        double speed = speedHorizontal;
+        if (speed < 0 || speed > 254.25)
+            speed = 255; // 255 is defined in the specification as the Invalid value
+        this.speedHorizontal = speed;
     }
 
     public double getSpeedVertical() { return speedVertical; }
@@ -124,9 +123,10 @@ public class LocationData extends MessageData {
             return res.getString(R.string.unknown);
     }
     public void setSpeedVertical(double speedVertical) {
-        if (speedVertical < -62 || speedVertical > 62)
-            speedVertical = 63; // 63 is defined in the specification as the Invalid value
-        this.speedVertical = speedVertical;
+        double speed = speedVertical;
+        if (speed < -62 || speed > 62)
+            speed = 63; // 63 is defined in the specification as the Invalid value
+        this.speedVertical = speed;
     }
 
     public double getLatitude() { return latitude; }
@@ -136,11 +136,12 @@ public class LocationData extends MessageData {
         return String.format(Locale.US,"%3.7f", latitude);
     }
     public void setLatitude(double latitude) {
-        if (latitude < -90 || latitude > 90) {
-            latitude = 0;
+        double lat = latitude;
+        if (lat < -90 || lat > 90) {
+            lat = 0;
             this.longitude = 0; // both equal to zero is defined in the specification as the Invalid value
         }
-        this.latitude = latitude;
+        this.latitude = lat;
     }
 
     public double getLongitude() { return longitude; }
@@ -150,11 +151,12 @@ public class LocationData extends MessageData {
         return String.format(Locale.US,"%3.7f", longitude);
     }
     public void setLongitude(double longitude) {
-        if (longitude < -180 || longitude > 180) {
+        double lon = longitude;
+        if (lon < -180 || lon > 180) {
             this.latitude = 0;
-            longitude = 0; // both equal to zero is defined in the specification as the Invalid value
+            lon = 0; // both equal to zero is defined in the specification as the Invalid value
         }
-        this.longitude = longitude;
+        this.longitude = lon;
     }
 
     private String getAltitudeAsString(double altitude, Resources res) {
@@ -165,16 +167,18 @@ public class LocationData extends MessageData {
     public double getAltitudePressure() { return altitudePressure; }
     public String getAltitudePressureAsString(Resources res) { return getAltitudeAsString(altitudePressure, res); }
     public void setAltitudePressure(double altitudePressure) {
-        if (altitudePressure < -1000 || altitudePressure > 31767)
-            altitudePressure = -1000; // -1000 is defined in the specification as the Invalid value
-        this.altitudePressure = altitudePressure;
+        double alt = altitudePressure;
+        if (alt < -1000 || alt > 31767)
+            alt = -1000; // -1000 is defined in the specification as the Invalid value
+        this.altitudePressure = alt;
     }
     public double getAltitudeGeodetic() { return altitudeGeodetic; }
     public String getAltitudeGeodeticAsString(Resources res) { return getAltitudeAsString(altitudeGeodetic, res); }
     public void setAltitudeGeodetic(double altitudeGeodetic) {
-        if (altitudeGeodetic < -1000 || altitudeGeodetic > 31767)
-            altitudeGeodetic = -1000; // -1000 is defined in the specification as the Invalid value
-        this.altitudeGeodetic = altitudeGeodetic;
+        double alt = altitudeGeodetic;
+        if (alt < -1000 || alt > 31767)
+            alt = -1000; // -1000 is defined in the specification as the Invalid value
+        this.altitudeGeodetic = alt;
     }
     public double getHeight() { return height; }
     public String getHeightAsString(Resources res) { return getAltitudeAsString(height, res); }
@@ -184,9 +188,10 @@ public class LocationData extends MessageData {
         return String.format(Locale.US,"%3.0fm", height);
     }
     public void setHeight(double height) {
-        if (height < -1000 || height > 31767)
-            height = -1000; // -1000 is defined in the specification as the Invalid value
-        this.height = height;
+        double h = height;
+        if (h < -1000 || h > 31767)
+            h = -1000; // -1000 is defined in the specification as the Invalid value
+        this.height = h;
     }
 
     public enum HorizontalAccuracyEnum {
@@ -327,11 +332,12 @@ public class LocationData extends MessageData {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
     public void setLocationTimestamp(double locationTimestamp) {
-        if (locationTimestamp < 0)
-            locationTimestamp = 0;
-        if (locationTimestamp != 0xFFFF && locationTimestamp > 36000)
-            locationTimestamp = 36000; // Max one hour is allowed. Unit is 0.1s
-        this.locationTimestamp = locationTimestamp;
+        double timestamp = locationTimestamp;
+        if (timestamp < 0)
+            timestamp = 0;
+        if (timestamp != 0xFFFF && timestamp > 36000)
+            timestamp = 36000; // Max one hour is allowed. Unit is 0.1s
+        this.locationTimestamp = timestamp;
     }
 
     public double getTimeAccuracy() { return timeAccuracy; }
@@ -342,11 +348,12 @@ public class LocationData extends MessageData {
             return String.format(Locale.US,"<= %1.1f s", timeAccuracy);
     }
     public void setTimeAccuracy(double timeAccuracy) {
-        if (timeAccuracy < 0)
-            timeAccuracy = 0;
-        if (timeAccuracy > 1.5)
-            timeAccuracy = 1.5; // 1.5s is the maximum value in the specification
-        this.timeAccuracy = timeAccuracy;
+        double acc = timeAccuracy;
+        if (acc < 0)
+            acc = 0;
+        if (acc > 1.5)
+            acc = 1.5; // 1.5s is the maximum value in the specification
+        this.timeAccuracy = acc;
     }
 
     public String getDistanceAsString() { return String.format(Locale.US,"~%.0f m", distance); }

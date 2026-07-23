@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -43,7 +44,6 @@ import com.mikepenz.fastadapter.select.SelectExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.Locale;
@@ -87,10 +87,10 @@ public class DeviceList extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         if (getActivity() == null)
             return;
-        super.onActivityCreated(savedInstanceState);
         AircraftViewModel model = new ViewModelProvider(getActivity()).get(AircraftViewModel.class);
         subscribeToModel(model);
     }
@@ -234,7 +234,7 @@ public class DeviceList extends Fragment {
                     setIdText(identification);
 
                     assert droneIcon != null;
-                    droneIcon.setColorFilter(0xff00ff00, PorterDuff.Mode.MULTIPLY);
+                    droneIcon.setColorFilter(new PorterDuffColorFilter(0xff00ff00, PorterDuff.Mode.MULTIPLY));
                     iconImageView.setImageDrawable(droneIcon);
                 }
             }

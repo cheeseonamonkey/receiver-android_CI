@@ -1,3 +1,4 @@
 Android/.idea
 Android/keystore.properties
 .DS_Store
+Android/.artifacts/

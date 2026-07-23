@@ -7,10 +7,12 @@
 package org.opendroneid.android.app;
 
 import android.Manifest;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -91,6 +93,9 @@ public class DebugActivity extends AppCompatActivity {
     private Handler handler;
     private Runnable runnableCode;
 
+    private ActivityResultLauncher<Intent> bluetoothEnableLauncher;
+    private ActivityResultLauncher<Intent> wifiEnableLauncher;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -108,39 +113,41 @@ public class DebugActivity extends AppCompatActivity {
             }
         }
 
-        checkBluetoothSupport(menu);
-        checkNaNSupport(menu);
-        checkWiFiSupport(menu);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            checkBluetoothSupport(menu);
+            checkNaNSupport(menu);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkWiFiSupport(menu);
+        }
         return true;
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private void checkBluetoothSupport(Menu menu) {
         Object object = getSystemService(BLUETOOTH_SERVICE);
         if (object == null)
             return;
         BluetoothAdapter bluetoothAdapter = ((android.bluetooth.BluetoothManager) object).getAdapter();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bluetoothAdapter.isLeCodedPhySupported()) {
+        if (bluetoothAdapter.isLeCodedPhySupported()) {
             menu.findItem(R.id.coded_phy).setTitle(getString(R.string.coded_phy_supported));
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && bluetoothAdapter.isLeExtendedAdvertisingSupported()) {
+        if (bluetoothAdapter.isLeExtendedAdvertisingSupported()) {
             menu.findItem(R.id.extended_advertising).setTitle(getString(R.string.ea_supported));
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private void checkNaNSupport(Menu menu) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)) {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)) {
             menu.findItem(R.id.wifi_nan).setTitle(getString(R.string.nan_supported));
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     private void checkWiFiSupport(Menu menu) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            menu.findItem(R.id.wifi_beacon_scan).setTitle(getString(R.string.wifi_beacon_scan_supported));
-        }
+        menu.findItem(R.id.wifi_beacon_scan).setTitle(getString(R.string.wifi_beacon_scan_supported));
     }
 
     private void showHelpMenu() {
@@ -152,6 +159,7 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.clear) {
             dataManager.getAircraft().clear();
             mModel.setAllAircraft(dataManager.getAircraft());
@@ -189,11 +197,11 @@ public class DebugActivity extends AppCompatActivity {
             showToast(message);
             return true;
         }
-        if (BuildConfig.USE_GOOGLE_MAPS)
-            if (mMapView != null) {
-                return mMapView.changeMapType(item);
-            }
-        return false;
+
+        if (BuildConfig.USE_GOOGLE_MAPS && mMapView != null) {
+            return mMapView.changeMapType(item);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     boolean getLogEnabled() {
@@ -207,13 +215,12 @@ public class DebugActivity extends AppCompatActivity {
     }
 
     private File getLoggerFileDir(String name) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "OpenDroneID");
-        if (!file.mkdirs()) {
-            file = getExternalFilesDir(null);
-        }
+        File documentsDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "OpenDroneID");
+        File dir = (documentsDir.exists() || documentsDir.mkdirs()) ? documentsDir : getExternalFilesDir(null);
+
         String pattern = "yyyy-MM-dd_HH-mm-ss.SSS";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, Locale.US);
-        return new File(file, "log_" + Build.MODEL + "_" + name + "_" + simpleDateFormat.format(new Date()) + ".csv");
+        return new File(dir, "log_" + Build.MODEL + "_" + name + "_" + simpleDateFormat.format(new Date()) + ".csv");
     }
 
     private void createNewLogfile() {
@@ -231,7 +238,7 @@ public class DebugActivity extends AppCompatActivity {
         try {
             logger = new LogWriter(loggerFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "createNewLogfile: failed", e);
         }
         btScanner.setLogger(logger);
     }
@@ -239,6 +246,37 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        bluetoothEnableLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            Log.d(TAG, "bluetoothEnableLauncher: call request permission");
+                            requestLocationPermission(Constants.FINE_LOCATION_PERMISSION_REQUEST_CODE);
+                        } else {
+                            initialize();
+                        }
+                    } else {
+                        Log.e(TAG, "bluetoothEnableLauncher: User declined to enable Bluetooth, exit the app.");
+                        showToast(getString(R.string.bt_not_enabled_leaving));
+                        forceStopApp();
+                    }
+                }
+        );
+
+        wifiEnableLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    if (!wifiManager.isWifiEnabled()) {
+                        Log.e(TAG, "wifiEnableLauncher: User declined to enable WiFi, exit the app.");
+                        showToast(getString(R.string.wifi_not_enabled_leaving));
+                        forceStopApp();
+                    }
+                }
+        );
 
         setContentView(R.layout.activity_debug);
         mModel = new ViewModelProvider(this).get(AircraftViewModel.class);
@@ -287,8 +325,9 @@ public class DebugActivity extends AppCompatActivity {
             if (!wifiManager.isWifiEnabled()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
-                    startActivityForResult(panelIntent, Constants.REQUEST_ENABLE_WIFI);
+                    wifiEnableLauncher.launch(panelIntent);
                 } else {
+                    //noinspection deprecation
                     wifiManager.setWifiEnabled(true);
                 }
             }
@@ -298,9 +337,9 @@ public class DebugActivity extends AppCompatActivity {
         if (bluetoothAdapter != null) {
             // Is Bluetooth turned on?
             if (!bluetoothAdapter.isEnabled()) {
-                // Prompt user to turn on Bluetooth (logic continues in onActivityResult()).
+                // Prompt user to turn on Bluetooth (logic continues in result launcher).
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+                bluetoothEnableLauncher.launch(enableBtIntent);
             } else {
                 // Check permission
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -375,33 +414,6 @@ public class DebugActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.REQUEST_ENABLE_BT) {
-            if (resultCode == RESULT_OK) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "onMapReady: call request permission");
-                    requestLocationPermission(Constants.FINE_LOCATION_PERMISSION_REQUEST_CODE);
-                } else {
-                    initialize();
-                }
-            } else {
-                Log.e(TAG, "onActivityResult: User declined to enable Bluetooth, exit the app.");
-                showToast(getString(R.string.bt_not_enabled_leaving));
-                forceStopApp();
-            }
-        } else if (requestCode == Constants.REQUEST_ENABLE_WIFI) {
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (!wifiManager.isWifiEnabled()) {
-                Log.e(TAG, "onActivityResult: User declined to enable WiFi, exit the app.");
-                showToast(getString(R.string.wifi_not_enabled_leaving));
-                forceStopApp();
-            }
-        }
-    }
-
     public void addDeviceList() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.holder, new DeviceList()).commitAllowingStateLoss();
@@ -412,7 +424,7 @@ public class DebugActivity extends AppCompatActivity {
         Log.d(TAG, "onResume");
 
         // Wake the main Activity thread regularly, to update time counters and other UI elements
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
         runnableCode = () -> {
             for (AircraftObject aircraft : dataManager.aircraft.values()) {
                 aircraft.updateShadowBasicId();
@@ -545,7 +557,7 @@ public class DebugActivity extends AppCompatActivity {
         else {
             Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content).getRootView(), message, Snackbar.LENGTH_LONG);
             View snackView = snackbar.getView();
-            TextView snackTextView = (TextView) snackView.findViewById(com.google.android.material.R.id.snackbar_text);
+            TextView snackTextView = snackView.findViewById(com.google.android.material.R.id.snackbar_text);
             snackTextView.setMaxLines(5);
             snackbar.show();
         }

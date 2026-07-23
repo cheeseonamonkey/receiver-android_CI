@@ -11,9 +11,7 @@
 
 package org.opendroneid.android.app;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -53,11 +51,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class AircraftOsMapView extends Fragment {
-    private final double P_TOKYO_LATITUDE = 35.681167;
-    private final double P_TOKYO_LONGITUDE = 139.767052;
-    private final double P_DEFAULT_LATITUDE = 0;
-    private final double P_DEFAULT_LONGITUDE = 0;
-
     private static final String TAG = "AircraftOsvMapView";
     private Context context;
     private MapView osvMap;
@@ -163,11 +156,11 @@ public class AircraftOsMapView extends Fragment {
         osvMap.setTileSource(TileSourceFactory.MAPNIK);
         osvMap.setMultiTouchControls(true);
 
-        MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(osvMap);
-        myLocationoverlay.enableMyLocation();
-        myLocationoverlay.disableFollowLocation();
-        myLocationoverlay.setDrawAccuracyEnabled(true);
-        osvMap.getOverlays().add(myLocationoverlay);
+        MyLocationNewOverlay myLocationOverlay = new MyLocationNewOverlay(osvMap);
+        myLocationOverlay.enableMyLocation();
+        myLocationOverlay.disableFollowLocation();
+        myLocationOverlay.setDrawAccuracyEnabled(true);
+        osvMap.getOverlays().add(myLocationOverlay);
 
         CompassOverlay compassOverlay = new CompassOverlay(requireContext(), osvMap);
         compassOverlay.enableCompass();
@@ -175,20 +168,15 @@ public class AircraftOsMapView extends Fragment {
 
         IMapController mapController = osvMap.getController();
         mapController.setZoom(3.0);
-        GeoPoint centerPoint = new GeoPoint(P_DEFAULT_LATITUDE, P_DEFAULT_LONGITUDE);
+        double pDefaultLatitude = 0;
+        double pDefaultLongitude = 0;
+        GeoPoint centerPoint = new GeoPoint(pDefaultLatitude, pDefaultLongitude);
         mapController.animateTo(centerPoint);
 
         setupModel();
     }
 
     public void setMapSettings() {
-        if (getActivity() == null) {
-            return;
-        }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
     }
 
     class MapObserver implements Observer<LocationData> {
@@ -239,29 +227,26 @@ public class AircraftOsMapView extends Fragment {
                 }
                 GeoPoint geoPoint = new GeoPoint(sys.getOperatorLatitude(), sys.getOperatorLongitude());
                 if (markerPilot == null) {
-                    String id = "ID missing";
+                    String pId = "ID missing";
                     if (aircraft.getIdentification1() != null) {
-                        id = aircraft.getIdentification1().getUasIdAsString();
+                        pId = aircraft.getIdentification1().getUasIdAsString();
                     }
                     markerPilot = new Marker(osvMap);
-                    markerPilot.setIcon(context.getDrawable(R.drawable.ic_pilot));
+                    markerPilot.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_pilot));
                     markerPilot.setPosition(geoPoint);
-                    markerPilot.setTitle(sys.getOperatorLocationType().toString() + "\n" + id);
+                    markerPilot.setTitle(sys.getOperatorLocationType().toString() + "\n" + pId);
                     if (markerPilot != null) {
                         makerPilotTag = new Pair<>(aircraft, this);
                     }
-                    Objects.requireNonNull(markerPilot).setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                        @Override
-                        public boolean onMarkerClick(Marker marker, MapView mapView) {
-                            if (marker != null) {
-                                Toast.makeText(context, marker.getTitle(), Toast.LENGTH_SHORT).show();
-                            }
-                            if (makerPilotTag instanceof AircraftObject) {
-                                model.setActiveAircraft((AircraftObject) makerPilotTag);
-                                return true;
-                            }
-                            return false;
+                    Objects.requireNonNull(markerPilot).setOnMarkerClickListener((marker, mapView) -> {
+                        if (marker != null) {
+                            Toast.makeText(context, marker.getTitle(), Toast.LENGTH_SHORT).show();
                         }
+                        if (makerPilotTag instanceof AircraftObject) {
+                            model.setActiveAircraft((AircraftObject) makerPilotTag);
+                            return true;
+                        }
+                        return false;
                     });
                     osvMap.getOverlays().add(markerPilot);
                 }
@@ -284,28 +269,25 @@ public class AircraftOsMapView extends Fragment {
             GeoPoint geoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
             // make marker
             if (marker == null) {
-                String id = "ID missing";
+                String aircraftId = "ID missing";
                 if (aircraft.getIdentification1() != null) {
-                    id = aircraft.getIdentification1().getUasIdAsString();
+                    aircraftId = aircraft.getIdentification1().getUasIdAsString();
                 }
                 marker = new Marker(osvMap);
                 marker.setPosition(geoPoint);
-                marker.setTitle("aircraft\n" + id);
+                marker.setTitle("aircraft\n" + aircraftId);
                 if (marker != null) {
                     makerTag = aircraft;
                 }
-                Objects.requireNonNull(marker).setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-                        if (marker != null) {
-                            Toast.makeText(context, marker.getTitle(), Toast.LENGTH_SHORT).show();
-                        }
-                        if (makerTag instanceof AircraftObject) {
-                            model.setActiveAircraft((AircraftObject) makerTag);
-                            return true;
-                        }
-                        return false;
+                Objects.requireNonNull(marker).setOnMarkerClickListener((marker1, mapView) -> {
+                    if (marker1 != null) {
+                        Toast.makeText(context, marker1.getTitle(), Toast.LENGTH_SHORT).show();
                     }
+                    if (makerTag instanceof AircraftObject) {
+                        model.setActiveAircraft((AircraftObject) makerTag);
+                        return true;
+                    }
+                    return false;
                 });
                 osvMap.getOverlays().add(marker);
                 zoom = true;

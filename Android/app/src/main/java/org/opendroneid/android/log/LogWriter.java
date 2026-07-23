@@ -76,7 +76,7 @@ public class LogWriter {
                     writer.flush();
                     writer.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "error closing writer", e);
                 }
             }
         });
@@ -103,7 +103,7 @@ public class LogWriter {
         entry.session = session;
         entry.timestamp = timeNano;
         entry.transportType = transportType;
-        entry.macAddress = Integer.toString(peerHash);
+        entry.macAddress = "" + peerHash;
         entry.msgVersion = msgVersion;
         entry.rssi = 0;
         if (serviceSpecificInfo != null)
@@ -133,7 +133,7 @@ public class LogWriter {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "close failed", e);
         }
     }
 }

@@ -81,12 +81,10 @@ public class OpenDroneIdDataManager {
                      OpenDroneIdParser.Message<?> message, LogMessageEntry logMessageEntry, String transportType) {
 
         // Handle connection
-        boolean newAircraft = false;
-        AircraftObject ac = aircraft.get(macAddressLong);
-        if (ac == null) {
-            ac = createNewAircraft(macAddress, macAddressLong);
-            newAircraft = true;
-        }
+        AircraftObject acFound = aircraft.get(macAddressLong);
+        boolean isNew = (acFound == null);
+        AircraftObject ac = isNew ? createNewAircraft(macAddress, macAddressLong) : acFound;
+
         long currentTime = System.currentTimeMillis();
         ac.getConnection().msgDelta = currentTime - ac.getConnection().lastSeen;
         ac.getConnection().lastSeen = currentTime;
@@ -96,7 +94,7 @@ public class OpenDroneIdDataManager {
         ac.getConnection().setMsgVersion(message.header.version);
         ac.connection.setValue(ac.connection.getValue());
 
-        if (newAircraft) {
+        if (isNew) {
             aircraft.put(macAddressLong, ac);
             callback.onNewAircraft(ac);
         }

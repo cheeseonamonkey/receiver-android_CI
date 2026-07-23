@@ -105,11 +105,11 @@ public class DeviceDetailFragment extends DialogFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         if (getActivity() == null)
             return;
 
-        super.onActivityCreated(savedInstanceState);
         DetailViewModel model = new ViewModelProvider(getActivity()).get(DetailViewModel.class);
 
         model.connection.observe(getViewLifecycleOwner(), connection -> {
@@ -190,7 +190,7 @@ public class DeviceDetailFragment extends DialogFragment {
 
             receiveTime.setText(selfIdData.getTimestampAsString());
             selfIdLastUpdate.setText(selfIdData.getMsgCounterAsString());
-            selfIdType.setText(String.valueOf(selfIdData.getDescriptionType().toString()));
+            selfIdType.setText(selfIdData.getDescriptionType().toString());
             selfIdDescription.setText(selfIdData.getOperationDescriptionAsString());
         });
 

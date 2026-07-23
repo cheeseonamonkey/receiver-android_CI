@@ -49,7 +49,7 @@ public class WiFiBeaconScanner {
     private static final int[] DRI_CID = {0xFA, 0x0B, 0xBC};
     private static final int VendorTypeLen = 1;
     private static final int VendorTypeValue = 0x0D;
-    private boolean WiFiScanEnabled = true;
+    private boolean wiFiScanEnabled = true;
     private final OpenDroneIdDataManager dataManager;
     private LogWriter logger;
     private WifiManager wifiManager;
@@ -75,7 +75,7 @@ public class WiFiBeaconScanner {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 !context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI)) {
             Toast.makeText(context, "WiFi Scanning is not supported", Toast.LENGTH_LONG).show();
-            WiFiScanEnabled = false;
+            wiFiScanEnabled = false;
             return;
         }
 
@@ -85,6 +85,7 @@ public class WiFiBeaconScanner {
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             Log.d(TAG, "Turning on Wi-Fi");
+            //noinspection deprecation
             wifiManager.setWifiEnabled(true);
         }
         IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -97,7 +98,11 @@ public class WiFiBeaconScanner {
             }
         };
 
-        context.registerReceiver(myReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(myReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            context.registerReceiver(myReceiver, filter);
+        }
     }
 
     void processRemoteIdVendorIE(ScanResult scanResult, ByteBuffer buf) {
@@ -143,7 +148,7 @@ public class WiFiBeaconScanner {
                 try {
                     handleResult(scanResult);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "handleScanResults: reflection failed", e);
                 }
             }
             startScan();
@@ -154,6 +159,7 @@ public class WiFiBeaconScanner {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             // On earlier Android APIs, the information element field is hidden.
             // Use reflection to access it.
+            //noinspection JavaReflectionMemberAccess
             Object value = ScanResult.class.getField("informationElements").get(scanResult);
             ScanResult.InformationElement[] elements = (ScanResult.InformationElement[]) value;
             if (elements == null)
@@ -184,9 +190,10 @@ public class WiFiBeaconScanner {
     }
 
     public void startScan() {
-        if (!WiFiScanEnabled) {
+        if (!wiFiScanEnabled) {
             return;
         }
+        //noinspection deprecation
         boolean ret = wifiManager.startScan();
         if (ret) {
             scanSuccess++;
@@ -198,7 +205,7 @@ public class WiFiBeaconScanner {
     }
 
     public void stopScan() {
-        if (!WiFiScanEnabled) {
+        if (!wiFiScanEnabled) {
             return;
         }
         if (countDownTimer != null) {
@@ -241,9 +248,5 @@ public class WiFiBeaconScanner {
         if (beaconScanDebugEnable) {
             Toast.makeText(context, sb, Toast.LENGTH_LONG).show();
         }
-    }
-
-    public void SetBeaconScanDebug(boolean enable) {
-        beaconScanDebugEnable = enable;
     }
 }

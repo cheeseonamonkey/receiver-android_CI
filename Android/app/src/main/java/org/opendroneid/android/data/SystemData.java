@@ -78,10 +78,11 @@ public class SystemData extends MessageData {
 
     public void setOperatorLatitude(double operatorLatitude) {
         if (operatorLatitude < -90 || operatorLatitude > 90) {
-            operatorLatitude = 0;
+            this.operatorLatitude = 0;
             this.operatorLongitude = 0; // both equal to zero is defined in the specification as the Invalid value
+        } else {
+            this.operatorLatitude = operatorLatitude;
         }
-        this.operatorLatitude = operatorLatitude;
     }
     public double getOperatorLatitude() { return operatorLatitude; }
     public String getOperatorLatitudeAsString(Resources res) {
@@ -91,11 +92,12 @@ public class SystemData extends MessageData {
     }
 
     public void setOperatorLongitude(double operatorLongitude) {
-        if (operatorLongitude < -180 || operatorLongitude > 180) {
+        double lon = operatorLongitude;
+        if (lon < -180 || lon > 180) {
             this.operatorLatitude = 0;
-            operatorLongitude = 0; // both equal to zero is defined in the specification as the Invalid value
+            lon = 0; // both equal to zero is defined in the specification as the Invalid value
         }
-        this.operatorLongitude = operatorLongitude;
+        this.operatorLongitude = lon;
     }
     public double getOperatorLongitude() { return operatorLongitude; }
     public String getOperatorLongitudeAsString(Resources res) {
