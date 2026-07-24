@@ -10,7 +10,7 @@ plugins {
 
 android {
     def versionMajor = 3
-    def versionMinor = 6
+    def versionMinor = 7
     def versionPatch = 0
     compileSdk = 37
 
