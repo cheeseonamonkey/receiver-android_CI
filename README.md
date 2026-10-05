@@ -114,3 +114,7 @@ The only way to increase this is to enable the [Android Developer Mode](https://
 An auto-generated view of the class structure can be seen in the below figure.
 
 ![](images/OpenDroneID.png)
+
+## Automated debug builds
+
+Debug APKs are attached to [GitHub Releases](https://github.com/opendroneid/receiver-android/releases). Default-branch builds are prereleases; version-tag builds are regular releases. Each build uses a temporary CI debug signing key, so installing a newer build may require uninstalling the previous one.
